@@ -12,11 +12,15 @@ class _BudgetScreenState extends State<BudgetScreen> {
   Widget build(BuildContext context) {
     TextEditingController moneyController = TextEditingController();
 
-    double? numberdata;
+    double? _numberdata;
 
-    double essentials = 0.0;
-    double personal = 0.0;
-    double savings = 0.0;
+    double essentialsRatio = 50;
+    double personalRatio = 30;
+    double savingsRatio = 20;
+
+    double _part1;
+    double _part2;
+    double _part3;
 
     @override
     void initState() {
@@ -31,11 +35,17 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
 
     void getMyBudget() {
-      numberdata = double.parse(moneyController.text);
+      _numberdata = double.parse(moneyController.text);
       setState(() {
-        essentials = (numberdata! / 100) * 50;
-        personal = (numberdata! / 100) * 30;
-        savings = (numberdata! / 100) * 20;
+        _part1 = ((essentialsRatio /
+                (essentialsRatio + personalRatio + savingsRatio)) *
+            _numberdata!);
+        _part2 = ((personalRatio /
+                (essentialsRatio + personalRatio + savingsRatio)) *
+            _numberdata!);
+        _part3 =
+            ((savingsRatio / (essentialsRatio + personalRatio + savingsRatio)) *
+                _numberdata!);
       });
     }
 
@@ -53,10 +63,16 @@ class _BudgetScreenState extends State<BudgetScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextField(
+              TextFormField(
                 cursorColor: Theme.of(context).colorScheme.secondary,
                 keyboardType: TextInputType.number,
                 controller: moneyController,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Please enter a value";
+                  }
+                  return null;
+                },
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
@@ -92,7 +108,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 height: 10,
               ),
               Text(
-                "${essentials}",
+                "Essential: $_part1",
                 style: TextStyle(fontSize: 18),
               ),
               const SizedBox(
@@ -109,7 +125,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 height: 10,
               ),
               Text(
-                "${personal}",
+                "Personals: $_part2",
                 style: TextStyle(fontSize: 18),
               ),
               const SizedBox(
@@ -126,7 +142,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 height: 10,
               ),
               Text(
-                "${savings}",
+                "Savings: $_part3",
                 style: TextStyle(fontSize: 18),
               ),
             ],
